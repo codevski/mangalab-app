@@ -5,36 +5,50 @@ import React from "react";
 import { Animated, Button, StyleSheet, Text, View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Kaomoji from "./components/Kaomoji";
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
 SplashScreen.preventAutoHide();
 
-function HomeScreen({ navigation }) {
+function LibraryScreen({ navigation }) {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "#212121",
+        backgroundColor: "#1b1b1b",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
       <Text
         style={{
-          color: "#fff",
+          color: "#ffffff",
           fontSize: 30,
           marginBottom: 15,
           fontWeight: "bold",
         }}
       >
-        Mangalab.
+        <Kaomoji />
       </Text>
-      <Button title="Run Again" onPress={() => Updates.reload()} />
+      <Text
+        style={{
+          color: "#6d6d6d",
+          fontSize: 10,
+          marginBottom: 15,
+          fontWeight: "bold",
+        }}
+      >
+        Your library is empty, add series to your library from Browse
+      </Text>
+      {/* <Button title="Run Again" onPress={() => Updates.reload()} />
       <Button onPress={navigation.openDrawer} title="Open navigation drawer" />
       <Button
         onPress={() => navigation.navigate("Notifications")}
         title="Go to notifications"
-      />
+      /> */}
     </View>
   );
 }
@@ -146,13 +160,118 @@ function AnimatedSplashScreen({ children, image }) {
   );
 }
 
+const DefaultStack = createStackNavigator();
+const Tabs = createBottomTabNavigator();
+
 function MainScreen() {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Notifications" component={NotificationsScreen} />
-      </Drawer.Navigator>
+      {/* <Drawer.Navigator
+        initialRouteName="Home"
+        drawerStyle={{
+          backgroundColor: "#424242",
+          width: 240,
+        }}
+      >
+        <Drawer.Screen name="Library" component={LibraryScreen} />
+        <Drawer.Screen name="Updates" component={NotificationsScreen} />
+        <Drawer.Screen name="History" component={NotificationsScreen} />
+        <Drawer.Screen name="Browse" component={NotificationsScreen} />
+      </Drawer.Navigator> */}
+      <Tabs.Navigator
+        tabBarOptions={{
+          activeTintColor: "#ffffff",
+          style: {
+            backgroundColor: "#424242",
+            borderTopColor: "transparent",
+          },
+        }}
+      >
+        <DefaultStack.Screen
+          name="Library"
+          component={LibraryScreen}
+          options={{
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "book-multiple" : "book-multiple"}
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <DefaultStack.Screen
+          name="Updates"
+          component={NotificationsScreen}
+          options={{
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "alert-octagram" : "alert-octagram-outline"}
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <DefaultStack.Screen
+          name="History"
+          component={NotificationsScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="history"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <DefaultStack.Screen
+          name="Browse"
+          component={NotificationsScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="apple-safari"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <DefaultStack.Screen
+          name="More"
+          component={NotificationsScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="dots-horizontal"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+      </Tabs.Navigator>
+      {/* <DefaultStack.Navigator headerMode="float">
+        <DefaultStack.Screen
+          name="Library"
+          component={LibraryScreen}
+          options={{
+            title: "Library",
+            headerStyle: {
+              backgroundColor: "#1b1b1b",
+              shadowColor: "transparent",
+              elevation: 0,
+            },
+            rashadowOffset: { height: 0, width: 0 },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          }}
+        />
+      </DefaultStack.Navigator> */}
     </NavigationContainer>
   );
 }
