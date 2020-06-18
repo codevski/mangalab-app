@@ -239,6 +239,7 @@ const RootStackScreen = ({ userToken }) => (
           headerTitleStyle: {
             fontWeight: "bold",
           },
+          headerTitleAlign: "left",
         })
       }
     />
