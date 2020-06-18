@@ -3,66 +3,42 @@ import { Asset } from "expo-asset";
 import Constants from "expo-constants";
 import React from "react";
 import { Animated, Button, StyleSheet, Text, View } from "react-native";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Kaomoji from "./components/Kaomoji";
+
+import LibraryScreen from "./screens/LibraryScreen";
+import UpdatesScreen from "./screens/UpdatesScreen";
+import HistoryScreen from "./screens/HistoryScreen";
+import BrowseScreen from "./screens/BrowseScreen";
+import MoreScreen from "./screens/MoreScreen";
+
+function getHeaderTitle(route) {
+  // Access the tab navigator's state using `route.state`
+  const routeName = route.state
+    ? // Get the currently active route name in the tab navigator
+      route.state.routes[route.state.index].name
+    : // If state doesn't exist, we need to default to `screen` param if available, or the initial screen
+      // In our case, it's "Feed" as that's the first screen inside the navigator
+      route.params?.screen || "Feed";
+
+  switch (routeName) {
+    case "Library":
+      return "Library";
+    case "Updates":
+      return "Updates";
+    case "History":
+      return "History";
+    case "Browse":
+      return "Browse";
+    case "More":
+      return "More";
+  }
+}
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
 SplashScreen.preventAutoHide();
-
-function LibraryScreen({ navigation }) {
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#1b1b1b",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Text
-        style={{
-          color: "#ffffff",
-          fontSize: 30,
-          marginBottom: 15,
-          fontWeight: "bold",
-        }}
-      >
-        <Kaomoji />
-      </Text>
-      <Text
-        style={{
-          color: "#6d6d6d",
-          fontSize: 10,
-          marginBottom: 15,
-          fontWeight: "bold",
-        }}
-      >
-        Your library is empty, add series to your library from Browse
-      </Text>
-      {/* <Button title="Run Again" onPress={() => Updates.reload()} />
-      <Button onPress={navigation.openDrawer} title="Open navigation drawer" />
-      <Button
-        onPress={() => navigation.navigate("Notifications")}
-        title="Go to notifications"
-      /> */}
-    </View>
-  );
-}
-
-function NotificationsScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Button onPress={navigation.openDrawer} title="Open navigation drawer" />
-      <Button onPress={() => navigation.goBack()} title="Go back home" />
-    </View>
-  );
-}
-
-const Drawer = createDrawerNavigator();
 
 export default function App() {
   return (
@@ -160,118 +136,119 @@ function AnimatedSplashScreen({ children, image }) {
   );
 }
 
-const DefaultStack = createStackNavigator();
+// const DefaultStack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
+const TabsScreen = ({ navigation, route }) => {
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerTitle: getHeaderTitle(route) });
+  }, [navigation, route]);
+  return (
+    <Tabs.Navigator
+      tabBarOptions={{
+        activeTintColor: "#ffffff",
+        style: {
+          backgroundColor: "#424242",
+          borderTopColor: "transparent",
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="Library"
+        component={LibraryScreen}
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? "book-multiple" : "book-multiple"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Updates"
+        component={UpdatesScreen}
+        options={{
+          tabBarIcon: ({ color, size, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? "alert-octagram" : "alert-octagram-outline"}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="History"
+        component={HistoryScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="history" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Browse"
+        component={BrowseScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="apple-safari"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="More"
+        component={MoreScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+    </Tabs.Navigator>
+  );
+};
+
+const RootStack = createStackNavigator();
+const RootStackScreen = ({ userToken }) => (
+  <RootStack.Navigator>
+    <RootStack.Screen
+      name="Home"
+      component={TabsScreen}
+      options={
+        (({ route }) => ({
+          headerTitle: getHeaderTitle(route),
+        }),
+        {
+          animationEnabled: false,
+          headerStyle: {
+            backgroundColor: "#1b1b1b",
+            shadowColor: "transparent",
+            elevation: 0,
+          },
+          rashadowOffset: { height: 0, width: 0 },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        })
+      }
+    />
+  </RootStack.Navigator>
+);
 
 function MainScreen() {
   return (
     <NavigationContainer>
-      {/* <Drawer.Navigator
-        initialRouteName="Home"
-        drawerStyle={{
-          backgroundColor: "#424242",
-          width: 240,
-        }}
-      >
-        <Drawer.Screen name="Library" component={LibraryScreen} />
-        <Drawer.Screen name="Updates" component={NotificationsScreen} />
-        <Drawer.Screen name="History" component={NotificationsScreen} />
-        <Drawer.Screen name="Browse" component={NotificationsScreen} />
-      </Drawer.Navigator> */}
-      <Tabs.Navigator
-        tabBarOptions={{
-          activeTintColor: "#ffffff",
-          style: {
-            backgroundColor: "#424242",
-            borderTopColor: "transparent",
-          },
-        }}
-      >
-        <DefaultStack.Screen
-          name="Library"
-          component={LibraryScreen}
-          options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <MaterialCommunityIcons
-                name={focused ? "book-multiple" : "book-multiple"}
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-        <DefaultStack.Screen
-          name="Updates"
-          component={NotificationsScreen}
-          options={{
-            tabBarIcon: ({ color, size, focused }) => (
-              <MaterialCommunityIcons
-                name={focused ? "alert-octagram" : "alert-octagram-outline"}
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-        <DefaultStack.Screen
-          name="History"
-          component={NotificationsScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="history"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-        <DefaultStack.Screen
-          name="Browse"
-          component={NotificationsScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="apple-safari"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-        <DefaultStack.Screen
-          name="More"
-          component={NotificationsScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="dots-horizontal"
-                color={color}
-                size={size}
-              />
-            ),
-          }}
-        />
-      </Tabs.Navigator>
-      {/* <DefaultStack.Navigator headerMode="float">
-        <DefaultStack.Screen
-          name="Library"
-          component={LibraryScreen}
-          options={{
-            title: "Library",
-            headerStyle: {
-              backgroundColor: "#1b1b1b",
-              shadowColor: "transparent",
-              elevation: 0,
-            },
-            rashadowOffset: { height: 0, width: 0 },
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-          }}
-        />
-      </DefaultStack.Navigator> */}
+      <RootStackScreen />
     </NavigationContainer>
   );
 }
